@@ -53,7 +53,7 @@ module.exports = {
           .setTitle('dice: " + num + "d" + max')
           .setDescription("ダイスの目は" + result + "でした。");
 
-      interaction.reply({ embeds: message });
+      interaction.reply({ embeds: [message] });
 
       function getRandInt(min, max) {
         return Math.floor(Math.random() * max) + min;
