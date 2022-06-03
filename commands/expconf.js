@@ -1,20 +1,26 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { Permissions } = require('discord.js');
+
 module.exports = {
-  name: 'expconf',
-  description: '経験値の倍率を設定します。',
-  execute(message, args) {
+  data: new SlashCommandBuilder()
+      .setName('expconf')
+      .setDescription('経験値の倍率を設定します。')
+      .addNumberOption(option =>
+          option.setName('magnitude')
+              .setDescription('倍率')
+              .setRequired(true)
+      )
+  ,
+  async execute(interaction)
+  {
+    if (!interaction.member.has(Permissions.FLAGS.ADMINISTRATOR)) return;
 
-    if (!message.member.hasPermission('ADMINISTRATOR')) {
-      return;
-    }
-
-    let mag = Number(args[0]);
-
-    if (isNaN(mag)) return;
+    let mag = interaction.options.getNumber('magnitude');
 
     const file = require('../modules/file.js');
-    const path = file.getPath(message.guild, "levels/expconf.json");
+    const path = file.getPath(interaction.guildId, "levels/expconf.json");
 
     file.writeJSONSync(path, mag);
-    message.channel.send("経験値倍率を" + String(mag) + "倍に変更しました。");
+    interaction.reply("経験値倍率を" + String(mag) + "倍に変更しました。");
   }
 }
