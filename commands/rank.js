@@ -10,14 +10,14 @@ module.exports = {
 
     const path = file.getPath(message.guild, "levels/levels.json");
     let memberStates = file.readJSONSync(path, []);
-    let memberState = memberStates.find(ms => ms.id == message.member.id);
+    let memberState = memberStates.find(ms => ms.id === message.member.id);
 
     if (memberState == null) return;
 
     // 通知設定オプション
-    if (args[0] == "notify") {
+    if (args[0] === "notify") {
       var output = '';
-      if (args[1] == "on") {
+      if (args[1] === "on") {
         memberState.notify = true;
         output = {
           embed:
@@ -26,7 +26,7 @@ module.exports = {
             description: "設定が完了しました！以後DMにてレベルアップの通知が届くようになります。"
           }
         };
-      } else if (args[1] == "off") {
+      } else if (args[1] === "off") {
         memberState.notify = false;
         output = {
           embed:
@@ -43,13 +43,13 @@ module.exports = {
       // 設定完了通知
       message.channel.send(output);
       return;
-    } else if (args[0] == "list") {
+    } else if (args[0] === "list") {
       // displayNameが取得できないので間にfetchを挟みとりあえず解決
       (async() => {
         var output = "";
         for (var i = 0; i < memberStates.length; i++) {
           // 10人まで表示
-          if (i == 10 && args[1] != "all") break;
+          if (i === 10 && args[1] !== "all") break;
           try {
             const memberState = memberStates[i];
             await message.guild.members.fetch(memberState.id).catch(console.log);
@@ -70,16 +70,14 @@ module.exports = {
         }
         // 最後の改行コードを削除(?)
         output.slice(0, -1);
-        if (args[1] != "all") {
+        if (args[1] !== "all") {
           message.channel.send({
             embed: {
               title: "ランク表 Top 10",
               description: output
             }
           });
-        } else if (args[1] == "all") {
-          // const fsEx = require("fs-extra");
-          // fsEx.outputFileSync("tmp/rank.txt", "全ランク表\n" + output);
+        } else if (args[1] === "all") {
           message.channel.send("全ランク表\n" + output);
         }
 
@@ -117,11 +115,11 @@ module.exports = {
       ]
     }
 
-    if (memberState.rank == 1) {
+    if (memberState.rank === 1) {
       embed.color = 0xe6b422;
-    } else if (memberState.rank == 2) {
+    } else if (memberState.rank === 2) {
       embed.color = 0xc0c0c0;
-    } else if (memberState.rank == 3) {
+    } else if (memberState.rank === 3) {
       embed.color = 0xb87333;
     }
 

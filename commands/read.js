@@ -3,7 +3,7 @@ module.exports = {
   description: 'コマンドが実行されたテキストチャンネル内の書き込みを読み上げます。',
   execute(message, args) {
 
-    if (args[0] == "h") {
+    if (args[0] === "h") {
       message.channel.send({
         embed:
         {
@@ -15,7 +15,7 @@ module.exports = {
     }
 
     // TODO: ディクショナリー（文字列置換ルール登録）
-    if (args[0] == "dic") {
+    if (args[0] === "dic") {
 
     }
 
@@ -31,7 +31,7 @@ module.exports = {
 
     var data = file.readJSONSync(path, {});
 
-    if (args[0] == "s") {
+    if (args[0] === "s") {
       // もし既に監視チャンネルが存在していた場合
       if (Object.keys(data).length) {
         message.reply("現在、既に他のボイスチャンネルで読み上げを行っているため読み上げを開始できません。");
@@ -47,7 +47,7 @@ module.exports = {
       data.voiceChannel = voiceChannel.id;
       data.textChannel = message.channel.id;
       file.writeJSONSync(path, data);
-    } else if (args[0] == "e") {
+    } else if (args[0] === "e") {
       message.channel.send({
         embed: {
           title: "テキスト読み上げを終了します！",

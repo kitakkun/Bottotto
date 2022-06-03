@@ -7,7 +7,7 @@ exports.getUserAction = (oldState, newState) => {
   } else if (oldUserChannel != null && newUserChannel == null) {
     // console.log("LEAVED");
     return "LEAVE";
-  } else if (oldUserChannel != newUserChannel) {
+  } else if (oldUserChannel !== newUserChannel) {
     // console.log("MOVED");
     return "MOVE";
   } else {
@@ -18,11 +18,11 @@ exports.getUserAction = (oldState, newState) => {
 
 exports.getEventType = (args) => {
   const Discord = require('discord.js');
-  if (args.length == 1 && args[0] instanceof Discord.Message) {
+  if (args.length === 1 && args[0] instanceof Discord.Message) {
     return 'message';
-  } else if (args.length == 2 && args[0] instanceof Discord.VoiceState && args[1] instanceof Discord.VoiceState) {
+  } else if (args.length === 2 && args[0] instanceof Discord.VoiceState && args[1] instanceof Discord.VoiceState) {
     return 'voiceStateUpdate';
-  } else if (args.length == 2 && args[0] instanceof Discord.MessageReaction && args[1] instanceof Discord.User) {
+  } else if (args.length === 2 && args[0] instanceof Discord.MessageReaction && args[1] instanceof Discord.User) {
     return 'messageReactionAdd';
   } else {
     return 'messageReactionAdd';
