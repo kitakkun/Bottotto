@@ -22,7 +22,7 @@ exports.read = async function read(message) {
   };
 
   if (Object.keys(data).length) {
-    if (message.channel.id == data.textChannel) {
+    if (message.channel.id === data.textChannel) {
       // 読み上げ処理
       var text = message.content.replaceAll('\n', ' ').replaceAll(/(?:https?|ftp):\/\/[\n\S]+/g, '');
 
@@ -33,7 +33,7 @@ exports.read = async function read(message) {
         const members = guild.members;
         for (var i = 0; i < memberIDs.length; i++) {
           const memberID = memberIDs[i].replace(/[^0-9]/g, '');
-          const member = members.cache.find(member => member.id == memberID);
+          const member = members.cache.find(member => member.id === memberID);
           if (member != null) text = text.replaceAll(memberIDs[i], "@" + member.displayName);
         }
       }
@@ -44,7 +44,7 @@ exports.read = async function read(message) {
         const roles = guild.roles;
         for (var i = 0; i < roleIDs.length; i++) {
           const roleID = roleIDs[i].replace(/[^0-9]/g, '');
-          const role = roles.cache.find(role => role.id == roleID);
+          const role = roles.cache.find(role => role.id === roleID);
           if (role != null) text = text.replaceAll(roleIDs[i], "@" + role.name);
         }
       }
@@ -55,7 +55,7 @@ exports.read = async function read(message) {
         const channels = guild.channels;
         for (var i = 0; i < channelIDs.length; i++) {
           const channelID = channelIDs[i].replace(/[^0-9]/g, '');
-          const channel = channels.cache.find(channel => channel.id == channelID);
+          const channel = channels.cache.find(channel => channel.id === channelID);
           if (channel != null) text = text.replaceAll(channelIDs[i], "テキストチャンネル" + channel.name);
         }
       }
@@ -124,7 +124,7 @@ exports.checkVoiceState = (oldState, newState) => {
   if (Object.keys(data).length) {
     const channel = guild.channels.resolve(data.voiceChannel);
     // 自分だけになったら抜ける
-    if (channel.members.array().length == 1) {
+    if (channel.members.array().length === 1) {
       data = {};
       file.writeJSONSync(path, data);
       channel.leave();

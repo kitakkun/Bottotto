@@ -7,10 +7,10 @@ exports.manage = (...args) => {
 
   // guild, memberオブジェクトの取得
   let guild, member;
-  if (eventType == 'message' || eventType == 'voiceStateUpdate'){
+  if (eventType === 'message' || eventType === 'voiceStateUpdate'){
     guild = args[0].guild;
     member = args[0].member;
-  } else if (eventType == 'messageReactionAdd') {
+  } else if (eventType === 'messageReactionAdd') {
     guild = args[0].message.guild;
     member = args[1];
   }

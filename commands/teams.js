@@ -2,7 +2,7 @@ module.exports = {
   name: 'teams',
   description: 'ボイスチャンネル内にいるメンバーを無作為にチーム分けします。',
   execute(message, args) {
-    if (args[0] == "h") {
+    if (args[0] === "h") {
       message.channel.send({
           embed: {
             title: "teamsコマンドの使い方",
@@ -19,7 +19,7 @@ module.exports = {
     }
     const members = voiceChannel.members.filter(member => !member.user.bot);
     const numOfMembers = members.array().length;
-    if (numOfMembers == 1) {
+    if (numOfMembers === 1) {
       message.reply("ぼっちでこのコマンド実行する意味、ある？（辛辣）");
       return;
     }
@@ -29,7 +29,7 @@ module.exports = {
       sum += args[i];
     }
     console.log();
-    if (sum != numOfMembers) {
+    if (sum !== numOfMembers) {
       message.reply("入力が不正です。正しく数値が入力されているか、再度確認してください。もしわからないことがあれば、「```k!teams help```」を実行してください！");
       return;
     }

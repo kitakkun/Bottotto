@@ -9,7 +9,7 @@ module.exports = {
 
     let mag = Number(args[0]);
 
-    if (mag == NaN) return;
+    if (isNaN(mag)) return;
 
     const file = require('../modules/file.js');
     const path = file.getPath(message.guild, "levels/expconf.json");
