@@ -21,18 +21,18 @@ exports.manageTC = async function manage(oldState, newState) {
   const voiceChannels = [oldState.channel, newState.channel].filter(item => item != null && item !== guild.afkChannel && item.name !== "グループ作成");
 
   // チャンネルの作成と管理
-  for (var i = 0; i < voiceChannels.length; i++) {
+  for (let i = 0; i < voiceChannels.length; i++) {
 
     const voiceChannel = voiceChannels[i];
     const name = voiceChannel.name.replace(' ', '-').replace('(', '').replace(')', '').toLowerCase() + "（聞き専）";
-    const connectedMembers = voiceChannel.members.array().length;
+    const connectedMembers = voiceChannel.members.size;
 
     const exist = associations.some(as => as.voiceChannel === voiceChannel.id);
 
     if (!exist && connectedMembers > 0) {
       let role = await guild.roles.create({data: {name: name}});
       let bot = await guild.roles.cache.find(role => role.name.toLowerCase() === 'bot');
-      var permissionOverwrites = [
+      const permissionOverwrites = [
         {id: role.id, allow: ['VIEW_CHANNEL']},
         {id: guild.roles.everyone.id, deny: ['VIEW_CHANNEL']}
       ];
@@ -80,7 +80,7 @@ exports.manageTC = async function manage(oldState, newState) {
   if (tcEM.isQueueStacked()) {
     console.log("イベントキューに情報が蓄積されていたため、関数を再帰的に呼び出しています…");
     const args = tcEM.getQueue();
-    manage(args[0], args[1]);
+    await manage(args[0], args[1]);
   }
 
   return new Promise((resolve, reject) => {
@@ -96,7 +96,7 @@ exports.manageVC = async function manageVC(oldState, newState) {
 
   if (newState.channel != null && newState.channel.name === 'グループ作成') {
     let channel = await guild.channels.create(oldState.member.displayName + 'のグループ', {type:'voice', parent: newState.channel.parent, position: newState.channel.rawPosition, userLimit: 16});
-    newState.member.voice.setChannel(channel);
+    await newState.member.voice.setChannel(channel);
     associations.push(channel.id);
   }
 
@@ -106,7 +106,7 @@ exports.manageVC = async function manageVC(oldState, newState) {
   for (var i = 0; i < voiceChannels.length; i++) {
     const voiceChannel = voiceChannels[i];
     if (associations.some(id => voiceChannel.id === id)) {
-      const connectedMembers = voiceChannel.members.array().length;
+      const connectedMembers = voiceChannel.members.size;
       if (connectedMembers === 0) {
         guild.channels.resolve(voiceChannel.id).delete();
         associations = associations.filter(as => as !== voiceChannel.id);

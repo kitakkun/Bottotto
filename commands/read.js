@@ -1,4 +1,5 @@
 const {SlashCommandBuilder} = require("@discordjs/builders");
+const { joinVoiceChannel, getVoiceConnection} = require('@discordjs/voice');
 const {MessageEmbed} = require("discord.js");
 module.exports = {
   help: new MessageEmbed()
@@ -40,12 +41,16 @@ module.exports = {
         interaction.reply("現在、既に他のボイスチャンネルで読み上げを行っているため読み上げを開始できません。");
         return;
       }
-      guild.channels.resolve(voiceChannel.id).join();
-      interaction.reply({
-        embed: {
-          title: "テキスト読み上げを開始します！",
-          description: "以後 #" + interaction.channel.name + " に書き込まれた内容を自動読み上げするよ！"
-        }
+
+      joinVoiceChannel({
+        channelId: voiceChannel.id,
+        guildId: guild.id,
+        adapterCreator: guild.voiceAdapterCreator
+      });
+      interaction.reply({ embeds: [
+          new MessageEmbed().setTitle("テキスト読み上げを開始します！")
+              .setDescription("以後 #" + interaction.channel.name + " に書き込まれた内容を自動読み上げするよ！")
+          ]
       });
       data.voiceChannel = voiceChannel.id;
       data.textChannel = interaction.channel.id;
@@ -55,13 +60,15 @@ module.exports = {
 
     if (subcommand === "e") {
       await interaction.reply({
-        embed: {
-          title: "テキスト読み上げを終了します！",
-          description: "じゃあの。また使ってくださいな。"
-        }
+        embeds: [
+            new MessageEmbed()
+                .setTitle("テキスト読み上げを終了します！")
+                .setDescription("じゃあの。また使ってくださいな。")
+        ]
       });
       if (Object.keys(data).length) {
-        await guild.channels.resolve(data.voiceChannel).leave();
+        const connection = getVoiceConnection(guild.id);
+        if (connection) connection.disconnect();
       }
       data = {};
       file.writeJSONSync(path, data);

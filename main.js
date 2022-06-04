@@ -6,7 +6,7 @@ const { Client, Intents, Collection} = require('discord.js');
 const { prefix, token, clientId } = require('./config.json');
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_VOICE_STATES]});
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_VOICE_STATES]});
 
 // 自作モジュールを読み込む
 const file = require('./modules/file.js');
@@ -34,6 +34,13 @@ client.once('ready', () => {
   client.user.setActivity("/h to help");
 });
 
+client.on("messageCreate", async message => {
+  // 読み上げ監視
+  await textReader.read(message);
+  // 経験値処理
+  levels.manage(message);
+});
+
 client.on('interactionCreate', async interaction => {
   // if the interaction is not a command, ignore it.
   if (!interaction.isCommand()) return;
@@ -48,35 +55,6 @@ client.on('interactionCreate', async interaction => {
   } catch (error) {
     console.error(error);
     await interaction.reply({ content: 'Oops, something went wrong with the command!' });
-  }
-});
-
-// テキストチャンネルの更新で発火
-client.on('message', message => {
-
-  if (message.author.bot) return;   // botからのメッセージは無視
-
-  // 読み上げ監視を記述
-  textReader.read(message);
-  // 経験値処理を記述
-  levels.manage(message);
-
-  // コマンドの認識と実行
-  // if (!message.content.startsWith(prefix)) return;  // prefixが指定されたものでない場合無視する
-
-  // メッセージ本文からprefix部分を除き、文字列の両端の空白を削除したのち、間の空白で分割しコマンド名と引数からなる配列を得る
-  const args = message.content.slice(prefix.length).trim().split(/ +/);
-  const command = args.shift().toLowerCase();   // コマンド名の取得
-
-  // コマンドが存在しない場合は無視
-  if (!client.commands.has(command)) return;
-
-  // コマンド実行＆エラーハンドリング
-  try {
-    client.commands.get(command).execute(message, args);
-  } catch (error) {
-    console.log(error);
-    message.reply('コマンド実行時にエラーが発生しました！ ' + error.message);
   }
 });
 
