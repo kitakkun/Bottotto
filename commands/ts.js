@@ -1,18 +1,26 @@
+const {SlashCommandBuilder} = require("@discordjs/builders");
 module.exports = {
-  name: 'ts',
-  description: '時報の有効・無効を設定します。',
-  execute(message, args) {
+  data: new SlashCommandBuilder()
+      .setName('ts')
+      .setDescription('時報の有効・無効を設定します。')
+      .addBooleanOption(option =>
+          option.setName('enable')
+              .setDescription('有効化・無効化')
+              .setRequired(true)
+      ),
+  async execute(interaction) {
+    const enable = interaction.options.getBoolean('enable');
     const file = require("../modules/file.js");
-    const path = file.getPath(message.guild, "timesignal.json");
+    const path = file.getPath(interaction.guildId, "timesignal.json");
     let memberIDs = file.readJSONSync(path, []);
-    if (args[0] === 'on' || args[0] === 'ON' || args[0] === 'On') {
-      if (!memberIDs.some(id => id === message.member.id)) {
-        memberIDs.push(message.member.id);
+    if (enable) {
+      if (!memberIDs.some(id => id === interaction.member.id)) {
+        memberIDs.push(interaction.member.id);
       }
-      message.channel.send("時報が有効化されました！毎日午前0時にBottottoから通知が来ます。");
-    } else if (args[0] === 'off' || args[0] === 'OFF' || args[0] === 'Off') {
-      memberIDs = memberIDs.filter(id => id !== message.member.id);
-      message.channel.send("時報が無効化されました！");
+      await interaction.reply("時報が有効化されました！毎日午前0時にBottottoから通知が来ます。");
+    } else {
+      memberIDs = memberIDs.filter(id => id !== interaction.member.id);
+      await interaction.reply("時報が無効化されました！");
     }
     file.writeJSONSync(path, memberIDs);
   }
