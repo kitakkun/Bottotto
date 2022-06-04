@@ -9,20 +9,20 @@ module.exports = {
       .setName('dice')
       .setDescription('ダイスを振ります。TRPGで使えます。')
       .addNumberOption(option =>
-          option.setName('diceCounts')
+          option.setName('dicecounts')
               .setDescription('振るダイスの数')
               .setRequired(true)
       )
       .addNumberOption(option =>
-          option.setName('diceMax')
+          option.setName('dicemax')
               .setDescription('ダイスの最大の目')
               .setRequired(true)
       )
   ,
   async execute(interaction) {
 
-      let num = interaction.options.getNumber('diceCounts');
-      let max = interaction.options.getNumber('diceMax');
+      let num = interaction.options.getNumber('dicecounts');
+      let max = interaction.options.getNumber('dicemax');
 
       let result = "";
 

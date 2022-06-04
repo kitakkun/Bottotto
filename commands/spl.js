@@ -10,8 +10,7 @@ module.exports = {
       .addStringOption(option =>
           option.setName('type')
               .setDescription('抽選を行う要素を選択')
-              .addChoice('rule', 'rule')
-              .addChoice('stage', 'stage')
+              .addChoices({name: 'rule', value:'rule'}, {name: 'stage', value: 'stage'})
       )
   ,
   async execute(interaction) {

@@ -5,18 +5,18 @@ module.exports = {
       .setName('h')
       .setDescription('コマンドのヘルプ')
       .addStringOption(option =>
-          option.setName('commandName')
+          option.setName('command')
               .setDescription('コマンド名')
       )
       .addStringOption(option =>
-          option.setName('subcommandName')
+          option.setName('subcommand')
               .setDescription('サブコマンド名')
       )
   ,
   async execute(interaction) {
 
-    const commandName = interaction.options.getString('commandName');
-    const subcommandName = interaction.options.getString('subcommandName');
+    const commandName = interaction.options.getString('command');
+    const subcommandName = interaction.options.getString('subcommand');
 
     const fs = require('fs');
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
