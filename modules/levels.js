@@ -19,14 +19,14 @@ exports.manage = (...args) => {
   let memberStates = file.readJSONSync(path, []);
 
   // データが存在していなければ
-  if (!memberStates.some(ms => ms.id == member.id)) {
+  if (!memberStates.some(ms => ms.id === member.id)) {
     // 新規に登録
     ms = {id: member.id, messageTimestamp: null, reactionTimestamp: null, voiceTimestamp: null, exp: 0, level: 1, rank: null, notify: false};
     memberStates.push(ms);
   }
 
   // 対象ユーザーのデータへの参照を得る
-  memberState = memberStates.find(ms => ms.id == member.id);
+  memberState = memberStates.find(ms => ms.id === member.id);
 
   const date = new Date();
   const nowTime = date.getTime();
@@ -42,20 +42,20 @@ exports.manage = (...args) => {
   // 経験値算出
   function calcExp(eventType, memberState) {
     let exp = 0;
-    if (eventType == 'message') {
+    if (eventType === 'message') {
       ts = memberState.messageTimestamp;
       if (ts == null || getElapsedMin(ts, nowTime) > 1) {
         exp = 5;
       }
-    } else if (eventType == 'messageReactionAdd') {
+    } else if (eventType === 'messageReactionAdd') {
       ts = memberState.reactionTimestamp;
       if (ts == null || getElapsedMin(ts, nowTime) > 1) {
         exp = 5;
       }
-    } else if (eventType == 'voiceStateUpdate') {
+    } else if (eventType === 'voiceStateUpdate') {
       ts = memberState.voiceTimestamp;
       userAction = util.getUserAction(args[0], args[1]);
-      if ((userAction == "LEAVE" || args[1].channel == guild.afkChannel) && ts != null) {
+      if ((userAction === "LEAVE" || args[1].channel === guild.afkChannel) && ts != null) {
         exp = Math.floor(getElapsedMin(ts, nowTime));
       }
     }

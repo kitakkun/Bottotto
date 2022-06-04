@@ -31,7 +31,7 @@ module.exports = {
 
     const file = require('../modules/file.js');
     const guild = interaction.guild;
-    const path = file.getPath(guild.id, "read/read.json");
+    const path = file.getPath(guild, "read/read.json");
 
     let data = file.readJSONSync(path, {});
 

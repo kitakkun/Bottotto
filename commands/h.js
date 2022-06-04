@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const {MessageEmbed} = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -24,26 +25,24 @@ module.exports = {
     if (commandName)
     {
       const command = require(`./${commandName}.js`);
-      if (command) interaction.reply("Command not found");
+      if (!command) { await interaction.reply("Command not found"); return; }
       if (subcommandName) {
         const subcommand = command.data.options.find(i => i.name === subcommandName);
         await interaction.reply(subcommand.name + "\n" + subcommand.name.description);
       } else {
-        interaction.reply(command.data.name + "\n" + command.name.description);
+        await interaction.reply(command.data.name + "\n" + command.data.description);
       }
+      return;
     }
 
     let output = '';
     for (const file of commandFiles) {
       const command = require(`./${file}`);
-      output += "`" + command.name + "` " + command.description + "\n";
+      output += "`" + command.data.name + "` " + command.data.description + "\n";
     }
 
-    interaction.reply({
-      embed: {
-        title: "コマンド一覧",
-        description: output
-      }
+    interaction.reply({ embeds: [new MessageEmbed()
+          .setTitle("コマンド一覧").setDescription(output)]
     });
   }
 }

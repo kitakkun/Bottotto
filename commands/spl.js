@@ -11,6 +11,7 @@ module.exports = {
           option.setName('type')
               .setDescription('抽選を行う要素を選択')
               .addChoices({name: 'rule', value:'rule'}, {name: 'stage', value: 'stage'})
+              .setRequired(true)
       )
   ,
   async execute(interaction) {
@@ -19,14 +20,14 @@ module.exports = {
     if (choice === 'rule') {
       const names = ['ガチエリア', 'ガチアサリ', 'ガチヤグラ', 'ナワバリバトル'];
       let item = names[Math.floor(Math.random()*names.length)];
-      await interaction.reply({ embed: { title: "Splatoon2 ルール自動選択", description: "「" + item + "」に決定しました！" } });
+      await interaction.reply({ embeds : [new MessageEmbed().setTitle("Splatoon2 ルール自動選択").setDescription("「" + item + "」に決定しました！")] });
       return;
     }
 
     if (choice === 'stage') {
       const names = ['ムツゴ楼', 'アンチョビットゲームズ', 'ホテルニューオートロ', 'スメーシーワールド', 'モンガラキャンプ場', 'ショッツル鉱山', 'アジフライスタジアム', 'アロワナモール', 'デボン海洋博物館', 'ハコフグ倉庫', 'ザトウマーケット', 'Bバスパーク', 'エンガワ河川敷', 'モズク農園', 'マンタマリア号', 'タチウオパーキング', 'ホッケふ頭', 'チョウザメ造船', '海女美術大学', 'コンブトラック', 'ガンガゼ野外音楽堂', 'フジツボスポーツクラブ', 'バッテラストリート'];
       let item = names[Math.floor(Math.random()*names.length)];
-      await interaction.reply({ embed: { title: "Splatoon2 ステージ自動選択", description: "「" + item + "」に決定しました！" } });
+      await interaction.reply({ embeds: [new MessageEmbed().setTitle("Splatoon2 ステージ自動選択").setDescription("「" + item + "」に決定しました！")] });
     }
   }
 }

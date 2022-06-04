@@ -13,12 +13,12 @@ module.exports = {
   ,
   async execute(interaction)
   {
-    if (!interaction.member.has(Permissions.FLAGS.ADMINISTRATOR)) return;
+    if (!interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
 
     let mag = interaction.options.getNumber('magnitude');
 
     const file = require('../modules/file.js');
-    const path = file.getPath(interaction.guildId, "levels/expconf.json");
+    const path = file.getPath(interaction.guild, "levels/expconf.json");
 
     file.writeJSONSync(path, mag);
     interaction.reply("経験値倍率を" + String(mag) + "倍に変更しました。");

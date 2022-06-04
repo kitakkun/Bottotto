@@ -32,7 +32,7 @@ module.exports = {
       }
 
       const message = new MessageEmbed()
-          .setTitle('dice: " + num + "d" + max')
+          .setTitle(`dice: ${num} + "d" + ${max}`)
           .setDescription("ダイスの目は" + result + "でした。");
 
       interaction.reply({ embeds: [message] });

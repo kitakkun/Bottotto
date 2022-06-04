@@ -33,7 +33,7 @@ module.exports = {
 
     const member = interaction.member;
 
-    const path = file.getPath(interaction.guildId, "levels/levels.json");
+    const path = file.getPath(interaction.guild, "levels/levels.json");
     let memberStates = file.readJSONSync(path, []);
     let memberState = memberStates.find(ms => ms.id === member.id);
 
@@ -46,7 +46,7 @@ module.exports = {
       {
         message = new MessageEmbed()
           .setTitle('レベルアップ通知ON')
-          .setDescription('設定が完了しました！以後DMにてレベルアップの通知が届くようになります。')
+          .setDescription('設定が完了しました！以後DMにてレベルアップの通知が届くようになります。');
         memberState.notify = true;
       }
       else
@@ -54,7 +54,7 @@ module.exports = {
         memberState.notify = false;
         message = new MessageEmbed()
             .setTitle('レベルアップ通知OFF')
-            .setDescription('設定が完了しました！以後DMにてレベルアップの通知が届かなくなります．')
+            .setDescription('設定が完了しました！以後DMにてレベルアップの通知が届かなくなります．');
       }
       // データの更新
       file.writeJSONSync(path, memberStates);
@@ -101,27 +101,27 @@ module.exports = {
       message = new MessageEmbed()
           .setTitle(member.displayName + "さんのランク")
           .setThumbnail(member.user.displayAvatarURL({ format: 'png' }))
-          .addFields([
+          .addFields(
             {
               name: "ランク",
-              value: memberState.rank + " 位",
+              value: `${memberState.rank} 位`,
               inline: true
             },
             {
               name: "レベル",
-              value: memberState.level,
+              value: `${memberState.level} `,
               inline: true
             },
             {
               name: "累計経験値",
-              value: memberState.exp + " EXP",
+              value: `${memberState.exp} EXP`,
               inline: true
             },
             {
               name: "レベルアップまで",
-              value: "あと" + requiredExp + " EXP"
+              value: `あと ${requiredExp} EXP`
             }
-          ]);
+          );
 
       if (memberState.rank === 1) {
         message.setColor(0xe6b422);

@@ -10,8 +10,8 @@ module.exports = {
       ),
   async execute(interaction) {
     let expression = interaction.options.getString('expression');
-    expression = expression.replaceAll(' ', '+');
+    expression = encodeURIComponent(expression);
     let output = "Wolfram大先生の解答はこちらです⇒ https://ja.wolframalpha.com/input/?i=" + expression;
-    interaction.reply(output).then(ms => ms.suppressEmbeds(true));
+    interaction.reply(output);
   }
 }

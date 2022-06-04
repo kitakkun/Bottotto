@@ -12,12 +12,12 @@ module.exports = {
       ),
   async execute(interaction)
   {
-    if (!interaction.member.has(Permissions.FLAGS.ADMINISTRATOR)) return;
+    if (!interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
 
     const amount = interaction.options.getNumber('amount');
 
     const file = require('../modules/file.js');
-    const path = file.getPath(interaction.guildId, "levels/levels.json");
+    const path = file.getPath(interaction.guild, "levels/levels.json");
     let memberStates = file.readJSONSync(path, []);
     for (let i = 0; i < memberStates.length; i++) {
       memberStates[i].exp += amount;
