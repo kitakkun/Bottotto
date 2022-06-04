@@ -1,47 +1,44 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
+
 module.exports = {
-  name: 'dice',
-  description: 'ダイスを振ります。TRPGで使えます。',
-  execute(message, args) {
-    if (args[0] === 'h') {
-      message.channel.send({
-        embed:
-        {
-          title: "diceコマンドの使い方",
-          description: "ダイスを振ります第1引数にはダイスの数を、第2引数にはダイスの最大の目を入力してください。"
-        }
-      });
-      return;
-    }
+  help: new MessageEmbed()
+      .setTitle('diceコマンドの使い方')
+      .setDescription('ダイスを振ります第1引数にはダイスの数を、第2引数にはダイスの最大の目を入力してください。'),
+  data: new SlashCommandBuilder()
+      .setName('dice')
+      .setDescription('ダイスを振ります。TRPGで使えます。')
+      .addNumberOption(option =>
+          option.setName('dicecounts')
+              .setDescription('振るダイスの数')
+              .setRequired(true)
+      )
+      .addNumberOption(option =>
+          option.setName('dicemax')
+              .setDescription('ダイスの最大の目')
+              .setRequired(true)
+      )
+  ,
+  async execute(interaction) {
 
-    let num = NaN, max = NaN;
+      let num = interaction.options.getNumber('dicecounts');
+      let max = interaction.options.getNumber('dicemax');
 
-    if (args.length === 2) {
-      num = Number(args[0]);
-      max = Number(args[1]);
-    } else if (args.length === 1 && args[0].match("[0-9]+d[0-9]+")) {
-      var array = args[0].split("d");
-      num = Number(array[0]);
-      max = Number(array[1]);
-    }
-    if (isNaN(num) || isNaN(max)) return;
+      let result = "";
 
-    let result = "";
-
-    for (let i = 0; i < num; i++) {
-      if (i !== 0) result += ", ";
-      result += getRandInt(1, max);
-    }
-
-    message.channel.send({
-      embed:
-      {
-        title: "dice: " + num + "d" + max,
-        description: "ダイスの目は" + result + "でした。"
+      for (let i = 0; i < num; i++) {
+        if (i !== 0) result += ", ";
+        result += getRandInt(1, max);
       }
-    });
 
-    function getRandInt(min, max) {
-      return Math.floor(Math.random() * max) + min;
-    }
+      const message = new MessageEmbed()
+          .setTitle(`dice: ${num} + "d" + ${max}`)
+          .setDescription("ダイスの目は" + result + "でした。");
+
+      interaction.reply({ embeds: [message] });
+
+      function getRandInt(min, max) {
+        return Math.floor(Math.random() * max) + min;
+      }
   }
 }

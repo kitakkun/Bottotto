@@ -1,28 +1,32 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { Permissions, MessageEmbed } = require('discord.js');
+
 module.exports = {
-  name: 'giveexp',
-  description: 'メンバー全員に経験値を付与します。',
-  execute(message, args) {
-    if (!message.member.hasPermission('ADMINISTRATOR')) {
-      console.log("[giveexp command] blocked operation.");
-      return;
-    }
-    args[0] = parseInt(args[0], 10);
-    if (isNaN(args[0])) return;
+  data: new SlashCommandBuilder()
+      .setName('giveexp')
+      .setDescription('メンバー全員に経験値を付与します。')
+      .addNumberOption(option =>
+          option.setName('amount')
+              .setDescription('付与する経験値')
+              .setRequired(true)
+      ),
+  async execute(interaction)
+  {
+    if (!interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) return;
+
+    const amount = interaction.options.getNumber('amount');
+
     const file = require('../modules/file.js');
-    const path = file.getPath(message.guild, "levels/levels.json");
+    const path = file.getPath(interaction.guild, "levels/levels.json");
     let memberStates = file.readJSONSync(path, []);
-    for (var i = 0; i < memberStates.length; i++) {
-      memberStates[i].exp += args[0];
+    for (let i = 0; i < memberStates.length; i++) {
+      memberStates[i].exp += amount;
     }
     file.writeJSONSync(path, memberStates);
-    message.channel.send(
-      {
-        embed:
-        {
-          title: "経験値付与完了",
-          description: "メンバー全員に" + args[0] + "経験値を付与しました。"
-        }
-      }
-    );
+
+    const message = new MessageEmbed()
+        .setTitle('経験値付与完了')
+        .setDescription("メンバー全員に" + amount + "経験値を付与しました。")
+    interaction.reply({ embeds: [message] });
   }
 }
