@@ -1,61 +1,67 @@
+const {SlashCommandBuilder} = require("@discordjs/builders");
+const {MessageEmbed} = require("discord.js");
 module.exports = {
-  name: 'read',
-  description: 'コマンドが実行されたテキストチャンネル内の書き込みを読み上げます。',
-  execute(message, args) {
+  help: new MessageEmbed()
+      .setTitle("readコマンドヘルプ")
+      .setDescription("`/read s`で読み上げ開始、`/read e`で読み上げを終了します。"),
+  data: new SlashCommandBuilder()
+      .setName('read')
+      .setDescription('コマンドが実行されたテキストチャンネル内の書き込みを読み上げます。')
+      .addSubcommand(subcommand =>
+          subcommand.setName('s')
+              .setDescription('読み上げを開始します')
+      )
+      .addSubcommand(subcommand =>
+          subcommand.setName('e')
+              .setDescription('読み上げを終了します')
+      )
+  ,
+  async execute(interaction) {
 
-    if (args[0] === "h") {
-      message.channel.send({
-        embed:
-        {
-          title: "readコマンドヘルプ",
-          description: "`k!read s`で読み上げ開始、`k!read e`で読み上げを終了します。"
-        }
-      });
-      return;
-    }
+    const subcommand = interaction.options.getSubcommand();
 
     // TODO: ディクショナリー（文字列置換ルール登録）
-    if (args[0] === "dic") {
 
-    }
-
-    const voiceChannel = message.member.voice.channel;
+    const voiceChannel = interaction.member.voice.channel;
     if (voiceChannel == null) {
-      message.reply("このコマンドを実行する際は、まず初めにボイスチャンネルに接続してください！");
+      await interaction.reply("このコマンドを実行する際は、まず初めにボイスチャンネルに接続してください！");
       return;
     }
 
     const file = require('../modules/file.js');
-    const guild = message.guild;
-    const path = file.getPath(guild, "read/read.json");
+    const guild = interaction.guild;
+    const path = file.getPath(guild.id, "read/read.json");
 
-    var data = file.readJSONSync(path, {});
+    let data = file.readJSONSync(path, {});
 
-    if (args[0] === "s") {
+    if (subcommand === "s") {
       // もし既に監視チャンネルが存在していた場合
       if (Object.keys(data).length) {
-        message.reply("現在、既に他のボイスチャンネルで読み上げを行っているため読み上げを開始できません。");
+        interaction.reply("現在、既に他のボイスチャンネルで読み上げを行っているため読み上げを開始できません。");
         return;
       }
       guild.channels.resolve(voiceChannel.id).join();
-      message.channel.send({
+      interaction.reply({
         embed: {
           title: "テキスト読み上げを開始します！",
-          description: "以後 #" + message.channel.name + " に書き込まれた内容を自動読み上げするよ！"
+          description: "以後 #" + interaction.channel.name + " に書き込まれた内容を自動読み上げするよ！"
         }
       });
       data.voiceChannel = voiceChannel.id;
-      data.textChannel = message.channel.id;
+      data.textChannel = interaction.channel.id;
       file.writeJSONSync(path, data);
-    } else if (args[0] === "e") {
-      message.channel.send({
+      return;
+    }
+
+    if (subcommand === "e") {
+      await interaction.reply({
         embed: {
           title: "テキスト読み上げを終了します！",
           description: "じゃあの。また使ってくださいな。"
         }
       });
       if (Object.keys(data).length) {
-        guild.channels.resolve(data.voiceChannel).leave();
+        await guild.channels.resolve(data.voiceChannel).leave();
       }
       data = {};
       file.writeJSONSync(path, data);
