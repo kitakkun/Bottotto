@@ -17,6 +17,5 @@ exports.readJSONSync = (path, defaultValue=null) => {
 // guildオブジェクトとファイルパスからpathを生成
 exports.getPath = (guild, filepath) => {
   const root = require('../config.json').root;
-  const path = root + guild.id + "/" + filepath;
-  return path;
+  return root + guild.id + "/" + filepath;
 }

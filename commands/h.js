@@ -1,28 +1,48 @@
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const {MessageEmbed} = require("discord.js");
+
 module.exports = {
-  name: 'h',
-  description: '利用可能なコマンドの一覧を表示します。',
-  execute(message, args) {
+  data: new SlashCommandBuilder()
+      .setName('h')
+      .setDescription('コマンドのヘルプ')
+      .addStringOption(option =>
+          option.setName('command')
+              .setDescription('コマンド名')
+      )
+      .addStringOption(option =>
+          option.setName('subcommand')
+              .setDescription('サブコマンド名')
+      )
+  ,
+  async execute(interaction) {
+
+    const commandName = interaction.options.getString('command');
+    const subcommandName = interaction.options.getString('subcommand');
+
     const fs = require('fs');
     const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-    var output = "コマンドプレフィックス「k!」に続けて実行できるコマンドを以下にリスト表示します。\n\n";
-
-    for (const file of commandFiles) {
-      const command = require(`./${file}`);
-      const permission = command.clientPermissions;
-      if (permission != null && permission.includes('ADMINISTRATOR')) {
-        continue;
+    if (commandName)
+    {
+      const command = require(`./${commandName}.js`);
+      if (!command) { await interaction.reply("Command not found"); return; }
+      if (subcommandName) {
+        const subcommand = command.data.options.find(i => i.name === subcommandName);
+        await interaction.reply(subcommand.name + "\n" + subcommand.name.description);
+      } else {
+        await interaction.reply(command.data.name + "\n" + command.data.description);
       }
-      output += "`" + command.name + "` " + command.description + "\n";
+      return;
     }
 
-    output += "\n各コマンドの具体的な使用方法に関しては、「k!コマンド名 h」と入力してみてください。";
+    let output = '';
+    for (const file of commandFiles) {
+      const command = require(`./${file}`);
+      output += "`" + command.data.name + "` " + command.data.description + "\n";
+    }
 
-    message.channel.send({
-      embed: {
-        title: "コマンド一覧",
-        description: output
-      }
+    interaction.reply({ embeds: [new MessageEmbed()
+          .setTitle("コマンド一覧").setDescription(output)]
     });
   }
 }
