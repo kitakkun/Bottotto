@@ -13,6 +13,8 @@ exports.manageTC = async function manage(oldState, newState) {
 
   tcEM.busy = true;
 
+  
+
   const file = require('./file.js');
   const guild = oldState.guild;
   const path = file.getPath(guild, "tempChannel/textChannels.json");
