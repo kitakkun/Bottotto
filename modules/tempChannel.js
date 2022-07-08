@@ -1,8 +1,67 @@
 const file = require('./file.js');
 
+const {tempChannels} = require("./dbcontroller.js");
+const {
+  get_voice_activity_type, VOICE_ACTIVITY_JOIN,
+  VOICE_ACTIVITY_MOVE, VOICE_ACTIVITY_LEAVE
+} = require('./util/VoiceActivity.ts');
 const EventManager = require('./eventmanager.js');
+const {ChannelType} = require("discord-api-types/v9");
 tcEM = new EventManager();
 
+async function create_temp_role_and_channel(binding_channel) {
+
+  const name = binding_channel?.name + '(temporal)';
+  // create a private role
+  const role = await binding_channel?.guild.roles.create({
+    name: name,
+  }).then(console.log).catch(console.error);
+  // create a temporal text channel
+  const channel = await binding_channel?.guild.channels.create({
+    name: name,
+    type: ChannelType.GuildText,
+  }).then(console.log).catch(console.error);
+
+  return [role, channel];
+}
+
+async function register_bindings(binding_channel, role, channel)
+{
+
+}
+
+exports.manage_temp_text_channel = async function(oldState, newState) {
+
+  // detect JOIN or LEAVE or MOVE or MUTE_OR_DEAFEN
+  const activity_type = get_voice_activity_type(oldState, newState);
+
+  const new_channel = newState?.channel;
+  const old_channel = oldState?.channel;
+
+  if (activity_type === VOICE_ACTIVITY_JOIN)
+  {
+    let role, channel;
+    // 初めて入った場合
+    if (new_channel?.members?.size === 1)
+    {
+      await create_temp_role_and_channel(new_channel);
+    }
+    // ロールの付与
+    new_channel?.members.each(member => {
+      member.roles.add(role);
+    });
+  }
+  else if (activity_type === VOICE_ACTIVITY_LEAVE)
+  {
+    // 完全に誰もいなくなった場合
+    if (old_channel?.members?.size === 0)
+    {
+      // delete temporal text channel
+      old_channel?.guild.channels.delete()
+    }
+  }
+
+}
 exports.manageTC = async function manage(oldState, newState) {
 
   if (tcEM.busy) {
@@ -13,12 +72,7 @@ exports.manageTC = async function manage(oldState, newState) {
 
   tcEM.busy = true;
 
-  
 
-  const file = require('./file.js');
-  const guild = oldState.guild;
-  const path = file.getPath(guild, "tempChannel/textChannels.json");
-  let associations = file.readJSONSync(path, []);
 
   const voiceChannels = [oldState.channel, newState.channel].filter(item => item != null && item !== guild.afkChannel && item.name !== "グループ作成");
 

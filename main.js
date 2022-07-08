@@ -61,9 +61,12 @@ client.on('interactionCreate', async interaction => {
 // ボイスチャンネル関連のイベントで発火
 client.on('voiceStateUpdate', async(oldState, newState) => {
 
-  tempChannel.manageTC(oldState, newState);
-  tempChannel.manageVC(oldState, newState);
-  textReader.checkVoiceState(oldState, newState);
+
+  console.log(newState?.channel?.members?.size);
+
+  // tempChannel.manageTC(oldState, newState);
+  // tempChannel.manageVC(oldState, newState);
+  // textReader.checkVoiceState(oldState, newState);
 
   if (oldState.member.user.bot || newState.member.user.bot) return;
 
