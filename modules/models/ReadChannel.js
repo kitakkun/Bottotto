@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
+const {Sequelize, DataTypes, Model} = require('sequelize');
 
 module.exports = (sequelize) => {
     return sequelize.define("ReadChannel", {
@@ -35,5 +35,5 @@ module.exports = (sequelize) => {
                 len: 18,
             },
         },          // ギルドID
-    }, { });
+    }, {});
 };

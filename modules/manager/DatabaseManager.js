@@ -1,7 +1,6 @@
 module.exports.DatabaseManager = class DatabaseManager {
 
 
-
     /**
      * データベースに追加します
      * @param tableName

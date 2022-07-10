@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
+const {Sequelize, DataTypes, Model} = require('sequelize');
 
 module.exports = (sequelize) => {
     return sequelize.define("TempChannel", {
@@ -21,8 +21,7 @@ module.exports = (sequelize) => {
         channelType: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            validate: {
-            },
+            validate: {},
         },  // 一時チャンネルのタイプ（Voice, Text)
         bindingChannelId: {
             type: DataTypes.STRING,
@@ -40,5 +39,5 @@ module.exports = (sequelize) => {
                 len: 18,
             },
         }          // ギルドID
-    }, { });
+    }, {});
 };

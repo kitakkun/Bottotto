@@ -1,44 +1,44 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const {SlashCommandBuilder} = require('@discordjs/builders');
+const {MessageEmbed} = require('discord.js');
 
 module.exports = {
-  help: new MessageEmbed()
-      .setTitle('diceコマンドの使い方')
-      .setDescription('ダイスを振ります第1引数にはダイスの数を、第2引数にはダイスの最大の目を入力してください。'),
-  data: new SlashCommandBuilder()
-      .setName('dice')
-      .setDescription('ダイスを振ります。TRPGで使えます。')
-      .addNumberOption(option =>
-          option.setName('dicecounts')
-              .setDescription('振るダイスの数')
-              .setRequired(true)
-      )
-      .addNumberOption(option =>
-          option.setName('dicemax')
-              .setDescription('ダイスの最大の目')
-              .setRequired(true)
-      )
-  ,
-  async execute(interaction) {
+    help: new MessageEmbed()
+        .setTitle('diceコマンドの使い方')
+        .setDescription('ダイスを振ります第1引数にはダイスの数を、第2引数にはダイスの最大の目を入力してください。'),
+    data: new SlashCommandBuilder()
+        .setName('dice')
+        .setDescription('ダイスを振ります。TRPGで使えます。')
+        .addNumberOption(option =>
+            option.setName('dicecounts')
+                .setDescription('振るダイスの数')
+                .setRequired(true)
+        )
+        .addNumberOption(option =>
+            option.setName('dicemax')
+                .setDescription('ダイスの最大の目')
+                .setRequired(true)
+        )
+    ,
+    async execute(interaction) {
 
-      let num = interaction.options.getNumber('dicecounts');
-      let max = interaction.options.getNumber('dicemax');
+        let num = interaction.options.getNumber('dicecounts');
+        let max = interaction.options.getNumber('dicemax');
 
-      let result = "";
+        let result = "";
 
-      for (let i = 0; i < num; i++) {
-        if (i !== 0) result += ", ";
-        result += getRandInt(1, max);
-      }
+        for (let i = 0; i < num; i++) {
+            if (i !== 0) result += ", ";
+            result += getRandInt(1, max);
+        }
 
-      const message = new MessageEmbed()
-          .setTitle(`dice: ${num} + "d" + ${max}`)
-          .setDescription("ダイスの目は" + result + "でした。");
+        const message = new MessageEmbed()
+            .setTitle(`dice: ${num} + "d" + ${max}`)
+            .setDescription("ダイスの目は" + result + "でした。");
 
-      interaction.reply({ embeds: [message] });
+        interaction.reply({embeds: [message]});
 
-      function getRandInt(min, max) {
-        return Math.floor(Math.random() * max) + min;
-      }
-  }
+        function getRandInt(min, max) {
+            return Math.floor(Math.random() * max) + min;
+        }
+    }
 }

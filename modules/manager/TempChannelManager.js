@@ -1,5 +1,5 @@
-const { TempChannel } = require('../database');
-const { EventManager } = require("./EventManager");
+const {TempChannel} = require('../database');
+const {EventManager} = require("./EventManager");
 
 module.exports.TempChannelManager = class TempChannelManager {
 
@@ -106,22 +106,24 @@ module.exports.TempChannelManager = class TempChannelManager {
         if (channelManager === null || roleManager === null || memberCount !== 0) return;
 
         await TempChannel.findOne({
-            where: { bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id }
-        }).then(async(entry) => {
+            where: {bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id}
+        }).then(async (entry) => {
             if (!entry) return;
             await roleManager.delete(entry.tempRoleId);
             await channelManager.delete(entry.tempChannelId);
-            await TempChannel.destroy({where: {
+            await TempChannel.destroy({
+                where: {
                     tempChannelId: entry.tempChannelId,
                     tempRoleId: entry.tempRoleId,
                     channelType: entry.channelType,
                     bindingChannelId: entry.bindingChannelId,
                     guildId: entry.guildId,
-                }});
-        }).catch(async(e) => {
+                }
+            });
+        }).catch(async (e) => {
             console.error(e);
             await TempChannel.destroy({
-                where: { bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id }
+                where: {bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id}
             });
         });
 
@@ -130,20 +132,20 @@ module.exports.TempChannelManager = class TempChannelManager {
     async #updateMembersRole(oldState, newState) {
 
         await TempChannel.findOne({
-            where: { bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id }
-        }).then(async(entry) => {
+            where: {bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id}
+        }).then(async (entry) => {
             if (!entry) return;
-            await oldState?.member.roles.remove(entry.tempRoleId).catch(async(e) => {
-                await TempChannel.destroy({where: { bindingChannelId: entry.channelId, guildId: entry.guildId}});
+            await oldState?.member.roles.remove(entry.tempRoleId).catch(async (e) => {
+                await TempChannel.destroy({where: {bindingChannelId: entry.channelId, guildId: entry.guildId}});
             });
         });
 
         await TempChannel.findOne({
-            where: { bindingChannelId: newState?.channelId, guildId: newState?.guild.id }
-        }).then(async(entry) => {
+            where: {bindingChannelId: newState?.channelId, guildId: newState?.guild.id}
+        }).then(async (entry) => {
             if (!entry) return;
-            await newState?.member.roles.add(entry.tempRoleId).catch(async(e) => {
-                await TempChannel.destroy({where: { bindingChannelId: entry.channelId, guildId: entry.guildId}});
+            await newState?.member.roles.add(entry.tempRoleId).catch(async (e) => {
+                await TempChannel.destroy({where: {bindingChannelId: entry.channelId, guildId: entry.guildId}});
             });
         });
     }

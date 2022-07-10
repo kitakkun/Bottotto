@@ -1,8 +1,9 @@
 const {EventManager} = require("./EventManager");
-const { execSync } = require('child_process');
-const {PATH_TO_OPEN_JTALK, OPEN_JTALK_HTS_VOICE_PATH, OPEN_JTALK_DICTIONARY_PATH } = require("../../config.json");
+const {execSync} = require('child_process');
+const {PATH_TO_OPEN_JTALK, OPEN_JTALK_HTS_VOICE_PATH, OPEN_JTALK_DICTIONARY_PATH} = require("../../config.json");
 const {ReadChannel} = require("../database");
-const {joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus
+const {
+    joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus
 } = require("@discordjs/voice");
 const {makeDirSync} = require("fs-extra/lib/mkdirs/make-dir");
 
@@ -68,7 +69,7 @@ module.exports.ReadChannelManager = class ReadChannelManager {
 
         connection.subscribe(player);
 
-        player.on(AudioPlayerStatus.Idle, async() => {
+        player.on(AudioPlayerStatus.Idle, async () => {
             console.log("speech finished");
             this.isPlaying = false;
             if (this.eventManager.hasEvent()) {
@@ -96,7 +97,7 @@ module.exports.ReadChannelManager = class ReadChannelManager {
         const voiceChannel = await guild.channels.resolve(entry.voiceChannelId);
 
         if (voiceChannel?.members.size === 1 && connection) {
-            ReadChannel.destroy({ where: {guildId: guild.id }})
+            ReadChannel.destroy({where: {guildId: guild.id}})
                 .then(_ => {
                     connection.disconnect();
                 });
