@@ -1,5 +1,9 @@
 config.json
 node_modules
+server
+dictionary
+voices
+database.sqlite
 
 ### Node template
 # Logs
