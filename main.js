@@ -1,38 +1,45 @@
-// Node.jsのモジュールを読み込む
+// load modules...
 const fs = require('node:fs');
-
 const {Client, Intents, Collection} = require('discord.js');
 const {token} = require('./config.json');
-
-const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_VOICE_STATES]
-});
-
-// 自作モジュールを読み込む
 const timeSignal = require('./modules/timesignal.js');
 const path = require("path");
-
 const {syncDatabase} = require("./modules/database");
 const {TempChannelManager} = require("./modules/manager/TempChannelManager");
 const {ReadChannelManager} = require("./modules/manager/ReadChannelManager");
 
-const tempChannelManager = new TempChannelManager();
-const readChannelManager = new ReadChannelManager();
+// initialize client
+const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_VOICE_STATES]
+});
+
+let guilds;
+const tempChannelManagers = new Map();
+const readChannelManagers = new Map();
+
+setupCommands(client);
 
 // 各種コマンドの設定
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
+function setupCommands(client) {
+    client.commands = new Collection();
+    const commandsPath = path.join(__dirname, 'commands');
+    const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
-    client.commands.set(command.data.name, command);
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+        client.commands.set(command.data.name, command);
+    }
 }
 
 // 準備完了時に発火
 client.once('ready', async () => {
     console.log('ready...');
+    guilds = client.guilds.cache.map(guild => guild.id);
+    for (let guildId of guilds) {
+        tempChannelManagers.set(guildId, new TempChannelManager());
+        readChannelManagers.set(guildId, new ReadChannelManager());
+    }
     timeSignal.start(client);
     await syncDatabase();
     client.user.setActivity("/h to help");
@@ -40,7 +47,7 @@ client.once('ready', async () => {
 
 client.on("messageCreate", async (message) => {
     // 読み上げ監視
-    await readChannelManager.speech(message);
+    await readChannelManagers.get(message?.guild.id).speech(message);
     // await textReader.read(message);
     // 経験値処理
     // levels.manage(message);
@@ -66,11 +73,14 @@ client.on('interactionCreate', async (interaction) => {
 // ボイスチャンネル関連のイベントで発火
 client.on('voiceStateUpdate', async (oldState, newState) => {
 
-    await tempChannelManager.processVoiceEvent(oldState, newState);
-    await readChannelManager.checkVoiceState(oldState, newState);
+    const guildId = oldState ? oldState?.guild.id : newState ? newState?.guild.id : null;
+
+    if (guildId) {
+        await tempChannelManagers.get(guildId).processVoiceEvent(oldState, newState);
+        await readChannelManagers.get(guildId)?.checkVoiceState(oldState, newState);
+    }
 
     if (oldState?.member?.user.bot || newState?.member?.user.bot) return;
-
 });
 
 // リアクションで発火

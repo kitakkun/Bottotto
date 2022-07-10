@@ -2,6 +2,7 @@ const {SlashCommandBuilder} = require("@discordjs/builders");
 const {joinVoiceChannel, getVoiceConnection} = require('@discordjs/voice');
 const {MessageEmbed} = require("discord.js");
 const {ReadChannel} = require("../modules/database");
+const {getReadChannelManager} = require("../main");
 
 module.exports = {
     help: new MessageEmbed()
@@ -23,8 +24,6 @@ module.exports = {
 
         const subcommand = interaction.options.getSubcommand();
 
-
-        // if user wants Bottotto to start reading messages...
         switch (subcommand) {
             case 's':
                 await start(interaction);
@@ -57,13 +56,14 @@ async function start(interaction) {
         textChannelId: textChannelId,
         ownerId: ownerId,
         guildId: guildId,
-    }).then(_ => {
-        joinVoiceChannel({
+    }).then(async (_) => {
+
+        await joinVoiceChannel({
             channelId: voiceChannelId,
             guildId: guildId,
             adapterCreator: interaction.guild.voiceAdapterCreator
         });
-        interaction.reply({
+        await interaction.reply({
             embeds: [
                 new MessageEmbed().setTitle("テキスト読み上げを開始します！")
                     .setDescription("以後 #" + interaction.channel.name + " に書き込まれた内容を自動読み上げするよ！")
@@ -98,6 +98,7 @@ async function end(interaction) {
                 .setDescription("じゃあの。また使ってくださいな。")
         ]
     });
+
 
     const connection = getVoiceConnection(current_configuration.guildId);
     if (connection) connection.disconnect();

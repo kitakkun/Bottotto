@@ -5,6 +5,10 @@ module.exports.EventManager = class EventManager {
     constructor() {
     }
 
+    reset() {
+        this.queue = [];
+    }
+
     push(params) {
         this.queue.push(params);
     }

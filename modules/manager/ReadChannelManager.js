@@ -14,18 +14,24 @@ module.exports.ReadChannelManager = class ReadChannelManager {
         this.isPlaying = false;
     }
 
+    #reset() {
+        this.eventManager.reset();
+        this.isPlaying = false;
+    }
+
     async speech(message) {
 
         if (this.isPlaying) {
-            console.log("pushed to the queue");
+            console.log("pushing");
             this.eventManager.push(message);
             return;
         }
 
-        this.isPlaying = true;
-
         const entry = await ReadChannel.findOne({where: {guildId: message.guild.id}});
-        if (!entry) return;
+        if (!entry) {
+            this.#reset();
+            return;
+        }
         if (entry.textChannelId !== message.channel.id) return;
 
         const directory_path = `./server/${entry.guildId}/`;
@@ -73,6 +79,7 @@ module.exports.ReadChannelManager = class ReadChannelManager {
             console.log("speech finished");
             this.isPlaying = false;
             if (this.eventManager.hasEvent()) {
+                console.log("re");
                 fs.unlinkSync(directory_path + wav_filename);
                 message = this.eventManager.pop();
                 await this.speech(message);
