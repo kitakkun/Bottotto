@@ -1,6 +1,9 @@
 config.json
 node_modules
-servers
+server
+dictionary
+voices
+database.sqlite
 
 ### Node template
 # Logs

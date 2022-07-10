@@ -7,8 +7,8 @@ export enum VoiceActivityType {
  * @param oldState
  * @param newState
  */
-export function getVoiceActivityType(oldState, newState) : VoiceActivityType
-{
+export function getVoiceActivityType(oldState, newState) {
+
     const oldChannel = oldState?.channel;
     const newChannel = newState?.channel;
 

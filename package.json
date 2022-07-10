@@ -14,6 +14,7 @@
     "libopus.js": "^0.0.1",
     "node-schedule": "^2.1.0",
     "sequelize": "^6.20.1",
-    "sqlite3": "^5.0.8"
+    "sqlite3": "^5.0.8",
+    "ffmpeg-static": "^5.0.2"
   }
 }

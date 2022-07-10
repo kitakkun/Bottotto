@@ -1,25 +1,27 @@
 // Node.jsのモジュールを読み込む
 const fs = require('node:fs');
-const Discord = require('discord.js');
 
 const { Client, Intents, Collection} = require('discord.js');
-const { prefix, token, clientId } = require('./config.json');
+const { token } = require('./config.json');
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_VOICE_STATES]});
 
 // 自作モジュールを読み込む
-const file = require('./modules/file.js');
-const tempChannel = require('./modules/tempChannel.js');
-const textReader = require('./modules/textReader.js');
-const levels = require('./modules/levels.js');
 const timeSignal = require('./modules/timesignal.js');
 const path = require("path");
+
+const { syncDatabase } = require("./modules/database");
+const { TempChannelManager } = require("./modules/manager/TempChannelManager");
+const {ReadChannelManager} = require("./modules/manager/ReadChannelManager");
+
+const tempChannelManager = new TempChannelManager();
+const readChannelManager = new ReadChannelManager();
 
 // 各種コマンドの設定
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith('.js'));
 
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
@@ -28,20 +30,22 @@ for (const file of commandFiles) {
 }
 
 // 準備完了時に発火
-client.once('ready', () => {
+client.once('ready', async() => {
   console.log('ready...');
   timeSignal.start(client);
+  await syncDatabase();
   client.user.setActivity("/h to help");
 });
 
-client.on("messageCreate", async message => {
+client.on("messageCreate", async (message) => {
   // 読み上げ監視
-  await textReader.read(message);
+    await readChannelManager.speech(message);
+  // await textReader.read(message);
   // 経験値処理
-  levels.manage(message);
+  // levels.manage(message);
 });
 
-client.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async (interaction) => {
   // if the interaction is not a command, ignore it.
   if (!interaction.isCommand()) return;
   if (interaction.user.bot) return;
@@ -61,25 +65,20 @@ client.on('interactionCreate', async interaction => {
 // ボイスチャンネル関連のイベントで発火
 client.on('voiceStateUpdate', async(oldState, newState) => {
 
+    await tempChannelManager.processVoiceEvent(oldState, newState);
+    await readChannelManager.checkVoiceState(oldState, newState);
 
-  console.log(newState?.channel?.members?.size);
+    if (oldState?.member?.user.bot || newState?.member?.user.bot) return;
 
-  // tempChannel.manageTC(oldState, newState);
-  // tempChannel.manageVC(oldState, newState);
-  // textReader.checkVoiceState(oldState, newState);
-
-  if (oldState.member.user.bot || newState.member.user.bot) return;
-
-  levels.manage(oldState, newState);
 });
 
 // リアクションで発火
 client.on('messageReactionAdd', async(reaction, user) => {
-  levels.manage(reaction, user);
+  // levels.manage(reaction, user);
 });
 
 // メンバーが追加
-client.on('guildMemberAdd', member => {
+client.on('guildMemberAdd', (member) => {
 
 });
 
