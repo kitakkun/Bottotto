@@ -1,8 +1,10 @@
+/**
+ * @file implementation of 'read' command.
+ */
 const {SlashCommandBuilder} = require("@discordjs/builders");
 const {joinVoiceChannel, getVoiceConnection} = require('@discordjs/voice');
 const {MessageEmbed} = require("discord.js");
 const {ReadChannel} = require("../modules/database");
-const {getReadChannelManager} = require("../main");
 
 module.exports = {
     help: new MessageEmbed()
@@ -35,6 +37,11 @@ module.exports = {
     }
 }
 
+/**
+ * activate read-aloud function.
+ * @param interaction
+ * @returns {Promise<void>}
+ */
 async function start(interaction) {
 
     // check if this feature is already in use.
@@ -75,6 +82,11 @@ async function start(interaction) {
     });
 }
 
+/**
+ * deactivate read-aloud function.
+ * @param interaction
+ * @returns {Promise<void>}
+ */
 async function end(interaction) {
 
     const current_configuration = await ReadChannel.findOne({where: {guildId: interaction.guildId}});
