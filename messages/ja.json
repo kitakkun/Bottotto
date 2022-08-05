@@ -1,0 +1,7 @@
+{
+  "commands": {
+    "read": {
+      "serviceUnavailable": "現在他のメンバーが機能を使用中です．"
+    }
+  }
+}
