@@ -39,8 +39,12 @@ module.exports.ReadChannelManager = class ReadChannelManager {
 
         const wav_filename = `temp.wav`;
 
+        let text = message.content;
+        // ignore urls
+        text = text.replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
+
         // construct command string.
-        const command = `echo "${message.content}" | \ 
+        const command = `echo "${text}" | \ 
                         ${PATH_TO_OPEN_JTALK} \
                         -m ${OPEN_JTALK_HTS_VOICE_PATH} \
                         -x ${OPEN_JTALK_DICTIONARY_PATH} \
