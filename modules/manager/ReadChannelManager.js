@@ -6,6 +6,7 @@ const {
     joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus
 } = require("@discordjs/voice");
 const {makeDirSync} = require("fs-extra/lib/mkdirs/make-dir");
+const fs = require("fs");
 
 module.exports.ReadChannelManager = class ReadChannelManager {
 
