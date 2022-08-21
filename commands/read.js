@@ -21,6 +21,10 @@ module.exports = {
             subcommand.setName('e')
                 .setDescription('読み上げを終了します')
         )
+        .addSubcommand(subcommand =>
+            subcommand.setName('fe')
+                .setDescription('強制的に読み上げ設定を解除します')
+        )
     ,
     async execute(interaction) {
 
@@ -32,6 +36,9 @@ module.exports = {
                 break;
             case 'e':
                 await end(interaction);
+                break;
+            case 'fe':
+                await force_end(interaction);
                 break;
         }
     }
@@ -115,4 +122,27 @@ async function end(interaction) {
     const connection = getVoiceConnection(current_configuration.guildId);
     if (connection) connection.disconnect();
 
+}
+
+async function force_end(interaction) {
+
+    const current_configuration = await ReadChannel.findOne({where: {guildId: interaction.guildId}});
+
+    if (!current_configuration) {
+        await interaction.reply("読み上げを開始していません．");
+        return;
+    }
+
+    await ReadChannel.destroy({where: {guildId: interaction.guildId}});
+
+    await interaction.reply({
+        embeds: [
+            new MessageEmbed()
+                .setTitle("テキスト読み上げを終了します！")
+                .setDescription("強制的に読み上げ設定を解除しました．")
+        ]
+    });
+
+    const connection = getVoiceConnection(current_configuration.guildId);
+    if (connection) connection.disconnect();
 }
