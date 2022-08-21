@@ -7,6 +7,15 @@ For example, Bottotto can...
 - manage temporal private text channels.
 - and more...
 
+## Features
+### Temporal Private Text Channel
+
+When you enter a voice channel, Bottotto automatically creates a temporal private text channel. This channel is only visible from users in the voice channel.
+
+When nobody exists in the voice channel, Bottotto automatically delete the temporal text channel to keep your discord server clean.
+
+https://user-images.githubusercontent.com/48154936/185778956-8a39db8d-c915-498e-a912-1e78e10f7075.mp4
+
 ## Installation
 
 ### Dependencies
@@ -27,12 +36,27 @@ Here's the template of `config.json`.
 {
   "token": "place the token of your discord bot here.",
   "root": "servers/",
-  "guildId": "your server's id",
   "clientId": "client id of your discord bot",
   "PATH_TO_OPEN_JTALK": "path to OpenJTalk executable.",
   "OPEN_JTALK_VOICE_PATH": "path to .htsvoice file.",
   "OPEN_JTALK_DICTIONARY_PATH": "path to OpenJTalk dictionary."
 }
+```
+
+### Install node modules
+
+The node packages we need is configured in `package.json`. So what you need to do is just run
+
+```shell
+npm install
+```
+
+### Deploy slash commands
+
+Before you begin, you need to deploy slash commands. To do it, run
+
+```shell
+node deploy-commands.js
 ```
 
 ### Run the program
