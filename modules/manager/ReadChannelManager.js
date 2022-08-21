@@ -6,6 +6,7 @@ const {
     joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, AudioPlayerStatus
 } = require("@discordjs/voice");
 const {makeDirSync} = require("fs-extra/lib/mkdirs/make-dir");
+const fs = require("fs");
 
 module.exports.ReadChannelManager = class ReadChannelManager {
 
@@ -17,6 +18,13 @@ module.exports.ReadChannelManager = class ReadChannelManager {
     #reset() {
         this.eventManager.reset();
         this.isPlaying = false;
+    }
+
+    #modify_text(text) {
+        // ignore urls
+        text = text.replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
+        // resolve role names
+        return text
     }
 
     async speech(message) {
@@ -40,8 +48,7 @@ module.exports.ReadChannelManager = class ReadChannelManager {
         const wav_filename = `temp.wav`;
 
         let text = message.content;
-        // ignore urls
-        text = text.replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
+        text = this.#modify_text(text)
 
         // construct command string.
         const command = `echo "${text}" | \ 
