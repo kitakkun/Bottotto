@@ -52,7 +52,7 @@ module.exports.TempChannelManager = class TempChannelManager {
 
         const entry = await TempChannel.findOne({
             where: {bindingChannelId: newState?.channelId, guildId: newState?.guild.id}
-        });
+        }).catch(console.error);
 
         if (channelManager === null || roleManager === null || memberCount !== 1 || entry) return;
 
@@ -62,7 +62,7 @@ module.exports.TempChannelManager = class TempChannelManager {
         let tempRole = await roleManager.create({
             name: tempName,
             reason: "to provide tempChannel feature"
-        });
+        }).catch(console.error);
 
         // create a temporary channel.
         let tempChannel = await channelManager.create(tempName, {
@@ -78,7 +78,7 @@ module.exports.TempChannelManager = class TempChannelManager {
                     deny: ["VIEW_CHANNEL"],
                 }
             ]
-        });
+        }).catch(console.error);
 
         await tempChannel.send(`ここは「${newState?.channel.name}」チャンネル専用の聞き専チャンネルです．ボイスチャンネル内のメンバーが0人になった時点で自動消滅します．`);
 
@@ -89,7 +89,7 @@ module.exports.TempChannelManager = class TempChannelManager {
             channelType: tempChannel.type,
             bindingChannelId: newState?.channel.id,
             guildId: newState?.guild.id,
-        });
+        }).catch(console.error);
     }
 
     /**
@@ -105,12 +105,13 @@ module.exports.TempChannelManager = class TempChannelManager {
 
         if (channelManager === null || roleManager === null || memberCount !== 0) return;
 
-        await TempChannel.findOne({
+        let entry = await TempChannel.findOne({
             where: {bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id}
-        }).then(async (entry) => {
-            if (!entry) return;
-            await roleManager.delete(entry.tempRoleId);
-            await channelManager.delete(entry.tempChannelId);
+        }).catch(console.error);
+
+        if (entry) {
+            await roleManager.delete(entry.tempRoleId).catch(console.error);
+            await channelManager.delete(entry.tempChannelId).catch(console.error);
             await TempChannel.destroy({
                 where: {
                     tempChannelId: entry.tempChannelId,
@@ -119,35 +120,28 @@ module.exports.TempChannelManager = class TempChannelManager {
                     bindingChannelId: entry.bindingChannelId,
                     guildId: entry.guildId,
                 }
-            });
-        }).catch(async (e) => {
-            console.error(e);
-            await TempChannel.destroy({
-                where: {bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id}
-            });
-        });
+            }).catch(console.error);
+        }
 
     }
 
     async #updateMembersRole(oldState, newState) {
 
-        await TempChannel.findOne({
+        let entry = await TempChannel.findOne({
             where: {bindingChannelId: oldState?.channelId, guildId: oldState?.guild.id}
-        }).then(async (entry) => {
-            if (!entry) return;
-            await oldState?.member.roles.remove(entry.tempRoleId).catch(async (e) => {
-                await TempChannel.destroy({where: {bindingChannelId: entry.channelId, guildId: entry.guildId}});
-            });
-        });
+        }).catch(console.error);
 
-        await TempChannel.findOne({
+        if (entry) {
+            await oldState?.member.roles.remove(entry.tempRoleId).catch(console.error);
+        }
+
+        entry = await TempChannel.findOne({
             where: {bindingChannelId: newState?.channelId, guildId: newState?.guild.id}
-        }).then(async (entry) => {
-            if (!entry) return;
-            await newState?.member.roles.add(entry.tempRoleId).catch(async (e) => {
-                await TempChannel.destroy({where: {bindingChannelId: entry.channelId, guildId: entry.guildId}});
-            });
-        });
+        }).catch(console.error);
+
+        if (entry) {
+            await newState?.member.roles.add(entry.tempRoleId).catch(console.error);
+        }
     }
 
     #getTempName(basename) {
