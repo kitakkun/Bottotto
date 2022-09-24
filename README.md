@@ -1,4 +1,4 @@
-# Bottotto
+# Bottotto (No longer maintained. archived)
 
 Bottotto is a discord bot, which has various features that make your discord experience better.
 
@@ -6,6 +6,15 @@ For example, Bottotto can...
 - read aloud messages written in a specific text channel.
 - manage temporal private text channels.
 - and more...
+
+## Important Notices
+
+**This project is no longer maintained** as it contains **too many bugs**.
+I think it will be so difficult to fix all of them, so I finally decided to archive this repository.
+
+However, my dreams to create powerful discord bot is never ruined! I'm currently porting Bottotto by using JDA(Java Discord API). If you are interested in it, please check 'kottotto' repository.
+
+My new project, kottotto is <a href="https://github.com/kitakkun/kottotto/">here</a> :D
 
 ## Features
 ### Temporal Private Text Channel
